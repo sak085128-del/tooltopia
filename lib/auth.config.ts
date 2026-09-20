@@ -88,12 +88,5 @@ export const authConfig: NextAuthConfig = {
       }
       return session;
     },
-    authorized({ auth, request }) {
-      const path = new URL(request.url).pathname;
-      if (path.startsWith("/admin")) {
-        return auth?.user?.role === "admin";
-      }
-      return true;
-    },
   },
 };

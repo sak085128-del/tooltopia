@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDb } from "./client";
 import {
   categories,
@@ -324,15 +325,17 @@ export type ComparisonWithTools = {
 
 export async function getComparisons(): Promise<ComparisonWithTools[]> {
   const db = getDb();
+  const toolA = alias(tools, "toolA");
+  const toolB = alias(tools, "toolB");
   const rows = await db
     .select({
       comparison: comparisons,
-      toolA: tools,
-      toolB: tools,
+      toolA,
+      toolB,
     })
     .from(comparisons)
-    .innerJoin(tools, eq(comparisons.tool_a_id, tools.id))
-    .innerJoin(tools, eq(comparisons.tool_b_id, tools.id));
+    .innerJoin(toolA, eq(comparisons.tool_a_id, toolA.id))
+    .innerJoin(toolB, eq(comparisons.tool_b_id, toolB.id));
 
   return Promise.all(
     rows.map(async (r) => ({
@@ -348,15 +351,17 @@ export async function getComparisons(): Promise<ComparisonWithTools[]> {
 
 export async function getComparisonBySlug(slug: string): Promise<ComparisonWithTools | null> {
   const db = getDb();
+  const toolA = alias(tools, "toolA");
+  const toolB = alias(tools, "toolB");
   const rows = await db
     .select({
       comparison: comparisons,
-      toolA: tools,
-      toolB: tools,
+      toolA,
+      toolB,
     })
     .from(comparisons)
-    .innerJoin(tools, eq(comparisons.tool_a_id, tools.id))
-    .innerJoin(tools, eq(comparisons.tool_b_id, tools.id))
+    .innerJoin(toolA, eq(comparisons.tool_a_id, toolA.id))
+    .innerJoin(toolB, eq(comparisons.tool_b_id, toolB.id))
     .where(eq(comparisons.slug, slug))
     .limit(1);
   if (rows.length === 0) return null;

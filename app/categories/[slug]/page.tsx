@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { queryTools, getCategoriesWithCounts } from "@/lib/db/queries";
 import { ToolCard } from "@/components/tool-card";
 import { Pagination } from "@/components/pagination";
+import { SortSelect } from "@/components/sort-select";
 import { SORT_OPTIONS } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -110,23 +111,12 @@ export default async function CategoryPage({
               </Link>
             ))}
           </div>
-          <select
-            aria-label="Sort tools"
+          <SortSelect
+            basePath={`/categories/${cat.slug}`}
+            q={q || undefined}
+            pricing={pricing || undefined}
             defaultValue={sort}
-            onChange={(e) => {
-              const params = new URLSearchParams();
-              if (q) params.set("q", q);
-              if (pricing) params.set("pricing", pricing);
-              params.set("sort", e.target.value);
-              window.location.href = `/categories/${cat.slug}?${params.toString()}`;
-            }}
-          >
-            {SORT_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         {error ? (
