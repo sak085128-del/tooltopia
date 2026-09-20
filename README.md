@@ -1,86 +1,108 @@
 # ToolTopia — AI Tools Directory
 
-Discover, search, compare and rank the best free AI tools in one place. A single-page directory with 100+ real AI tools across 10 categories, built with vanilla HTML/CSS/JS and deployable to any static host.
+Discover, search, compare and rank the best free AI tools in one place. A production-ready AI tools directory with 110+ real AI tools across 16 categories, built with Next.js (App Router), PostgreSQL (Neon), Drizzle ORM and Auth.js.
 
 ## Features
 
-- **110+ real AI tools** across 10 categories (Writing, Image, Video, Audio, Documents, Coding, Marketing, Education, Productivity, Business)
-- **Live search** with autocomplete suggestions and popular search chips
-- **Rankings** — tools are ranked by popularity with #1–#3 badges
-- **Compare tools** — pick up to 3 tools and compare side-by-side in a modal
-- **Favorites & Recently Viewed** — persisted in localStorage, with a filter chip in the directory
-- **Filters & sorting** — by category, pricing (Free/Freemium/Paid), favorites; sort by popularity, rating, newest, A–Z
+- **110+ real AI tools** across 16 categories (Writing, Image, Video, Audio, Documents, Coding, Marketing, Productivity, Education, Business, Design, Research, 3D, Developer Tools, Social Media, Other)
+- **Database-driven** — tools, categories, reviews, favorites, comparisons and submissions live in PostgreSQL; seed script ships all tools
+- **Live search with filters** — by query, category, pricing (Free/Freemium/Paid), favorites; sort by popularity, rating, newest, A–Z
+- **Tool detail pages** — `/ai-tools/[slug]` with features, tags, pricing, related tools, and user ratings & reviews (moderated)
+- **Compare tools** — up to 3 tools side-by-side; curated comparison pages (e.g. ChatGPT vs Claude)
+- **Accounts** — Auth.js credentials login with roles (`user` / `editor` / `admin`)
+- **Favorites & recently viewed** — persisted per account (favorites) and in localStorage
+- **Tool submissions** — visitors can submit tools for admin approval
+- **Admin dashboard** — `/admin` for managing tools, categories, submissions and reviews
 - **Dark / light theme** toggle (persisted, respects OS preference)
+- **SEO** — per-tool metadata, JSON-LD (SoftwareApplication + BreadcrumbList), dynamic sitemap.xml, robots.txt
+- **Monetization-ready** — Google AdSense configurable slots; cosmetic Cloudflare Turnstile on the newsletter form
 - **PWA** — installable (manifest + network-first service worker)
-- **Share** — copy link, X, WhatsApp, Telegram, LinkedIn from the tool modal
-- **Related tools**, dynamic hero stats, cookie consent, back-to-top, online/offline toasts
-- **SEO** — Open Graph, Twitter cards, JSON-LD, sitemap.xml, robots.txt
-- **Monetization-ready** — ad slots wired for display/push ad networks
 
 ## Tech Stack
 
-- Vanilla HTML5 + CSS3 (custom properties, dark/light theming, responsive)
-- Vanilla JavaScript (no build step, no dependencies)
+- Next.js 15 (App Router), React 19, TypeScript
+- PostgreSQL (Neon serverless) + Drizzle ORM + drizzle-kit migrations
+- Auth.js v5 (NextAuth credentials provider, bcrypt password hashing)
 - Deployed on Vercel via GitHub integration
+
+## Environment Variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | Neon PostgreSQL connection string (`postgresql://...`) |
+| `AUTH_SECRET` | Yes | NextAuth secret — generate with `npx auth secret` |
+| `ADMIN_EMAIL` | No | Email used by the seed script to create the first admin |
+| `ADMIN_NAME` | No | Display name for the first admin |
+| `ADMIN_PASSWORD` | No | Password for the first admin (only created if provided) |
+
+Copy `.env.example` to `.env.local` and fill in the values. `.env.*` files are gitignored — never commit secrets.
 
 ## Local Development
 
+Requires Node.js 18+ and a PostgreSQL database (local or Neon).
+
 ```bash
-# No build step needed — serve the folder
-npx --yes serve .
+npm install
+cp .env.example .env.local   # fill in DATABASE_URL, AUTH_SECRET
+npm run db:migrate           # apply drizzle migrations
+npm run db:seed              # seed categories, tools, comparisons, admin
+npm run dev                  # http://localhost:3000
 ```
 
-Then open the port shown by serve.
+## Database
 
-## Deployment
+Schema is defined in `lib/db/schema.ts` (categories, tools, tool_features, tool_tags, users, favorites, reviews, tool_submissions, comparisons).
 
-### Vercel (primary)
+```bash
+npm run db:generate   # generate a migration SQL file from schema changes
+npm run db:migrate    # apply pending migrations
+npm run db:seed       # idempotent: upserts categories/tools, adds preset comparisons and the first admin
+```
 
-Push to GitHub (or `vercel --prod` from this folder) — `vercel.json` is already configured with clean URLs plus cache & security headers. Every push auto-deploys.
+## Scripts
+
+- `npm run dev` — start the development server
+- `npm run build` — create a production build (runs type-checking)
+- `npm run start` — run the production build locally
+- `npm run typecheck` — `tsc --noEmit`
+- `npm run db:generate` / `db:migrate` / `db:seed` — database tooling
+- `node scripts/extract-tools.cjs` — re-export the legacy `TOOLS` array from `script.js` into `lib/data/tools.seed.json`
+
+## Deployment (Vercel)
+
+Push to GitHub and the Vercel project auto-deploys. Add the environment variables above in **Vercel → Project → Settings → Environment Variables**, then redeploy.
 
 Production: https://tooltopia.vercel.app
 
 ## Project Structure
 
 ```
-├── index.html              # Single page layout
-├── style.css               # Design tokens, dark/light themes, components
-├── script.js               # Data (TOOLS) + all UI logic
-├── vercel.json             # Vercel headers / clean URLs
-├── sw.js                   # Network-first service worker
-├── manifest.webmanifest    # PWA manifest
-├── robots.txt
-├── sitemap.xml
-└── assets/
-    ├── icons/
-    └── images/
+app/                         # Next.js App Router pages + API routes
+  api/                       # /api/tools, /api/views, /api/favorites, /api/reviews,
+                             # /api/submissions, /api/register, /api/admin/*
+  admin/                     # admin dashboard (auth + role protected)
+  sitemap.ts                 # dynamic sitemap
+  robots.ts                  # robots.txt
+components/                  # shared UI components (client + server)
+lib/
+  db/schema.ts               # Drizzle schema
+  db/queries.ts              # read queries (tools, categories, reviews, ...)
+  db/admin.ts                # admin queries
+  data/tools.seed.json       # seed data for 110+ tools
+  data/categories.ts         # categories + legacy name mapping
+  auth.config.ts             # NextAuth credentials config
+  utils.ts                   # helpers (slugify, formatting, ...)
+scripts/
+  migrate.ts                 # drizzle migration runner
+  seed.ts                    # idempotent seed script
+drizzle/                     # generated SQL migrations
+public/                      # static assets (icons, images, sw.js, manifest)
+middleware.ts                # session middleware, /admin protection
 ```
 
 ## Adding a Tool
 
-All tools live in the `TOOLS` array at the top of `script.js`. Each entry uses this shape:
-
-```js
-{
-  id: 'chatgpt',
-  name: 'ChatGPT',
-  slug: 'chatgpt',
-  icon: '🦾',            // emoji fallback shown as a colored tile
-  category: 'Writing',   // one of the 10 categories
-  desc: '...',           // 1-2 sentence description
-  features: ['...', '...'],
-  website: 'openai.com',
-  url: 'https://openai.com/chatgpt',
-  price: 'Freemium',     // Free | Freemium | Paid
-  rating: 4.8,
-  ratings: 15000,
-  isNew: false,
-  added: '2026-09-01',   // YYYY-MM-DD
-  pop: 97,               // popularity 0-100, drives rankings
-  tags: ['chat', 'writing', 'assistant'],
-  logo: 'https://www.google.com/s2/favicons?sz=128&domain=openai.com' // google s2 favicon
-}
-```
+Tools are seeded from `lib/data/tools.seed.json` (exported from the legacy `script.js`). New tools added at runtime through the admin dashboard go straight to the database.
 
 ## License
 

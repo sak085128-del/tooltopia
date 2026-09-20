@@ -6,6 +6,8 @@ node_modules/
 .wrangler/
 .wrangler.json
 .tools/
+.next/
+*.tsbuildinfo
 
 # OS / editor
 .DS_Store
