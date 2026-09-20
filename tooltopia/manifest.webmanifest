@@ -1,0 +1,20 @@
+{
+  "name": "ToolTopia — Discover the Best AI Tools",
+  "short_name": "ToolTopia",
+  "description": "Discover, search, compare and rank the best free AI tools in one place.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0D12",
+  "theme_color": "#0B0D12",
+  "orientation": "any",
+  "categories": ["productivity", "utilities", "education"],
+  "icons": [
+    {
+      "src": "assets/icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

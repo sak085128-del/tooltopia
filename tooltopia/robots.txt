@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /#/tools/
+
+Sitemap: https://tooltopia.vercel.app/sitemap.xml

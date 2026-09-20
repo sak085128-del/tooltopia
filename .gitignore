@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build / tooling caches
+.vercel/
+.wrangler/
+.wrangler.json
+.tools/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# Local env / secrets (never commit)
+.env
+.env.*
+!.env.example
