@@ -1,8 +1,0 @@
-{
-    "name": "tool",
-    "compatibility_date": "2026-09-19",
-    "assets": {
-        "directory": "./tooltopia",
-        "not_found_handling": "single-page-application"
-    }
-}

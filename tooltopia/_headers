@@ -1,9 +1,0 @@
-/
-  Cache-Control: no-cache
-
-/style.css
-  Cache-Control: no-cache
-/script.js
-  Cache-Control: no-cache
-/assets/*
-  Cache-Control: public, max-age=86400

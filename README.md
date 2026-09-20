@@ -21,48 +21,39 @@ Discover, search, compare and rank the best free AI tools in one place. A single
 
 - Vanilla HTML5 + CSS3 (custom properties, dark/light theming, responsive)
 - Vanilla JavaScript (no build step, no dependencies)
-- Works on any static host: Vercel, Cloudflare Pages, Netlify, GitHub Pages, etc.
+- Deployed on Vercel via GitHub integration
 
 ## Local Development
 
 ```bash
-# Serve the tooltopia/ directory (no build step needed)
-npx --yes serve tooltopia
-# or
-npx --yes wrangler dev   # Cloudflare-style dev server with _headers
+# No build step needed — serve the folder
+npx --yes serve .
 ```
 
-Then open http://localhost:8787 (wrangler) or the port shown by serve.
+Then open the port shown by serve.
 
 ## Deployment
 
-### Vercel (recommended)
+### Vercel (primary)
 
-Push to GitHub and import the repo — `vercel.json` is included with cache/security headers. Every push auto-deploys.
+Push to GitHub (or `vercel --prod` from this folder) — `vercel.json` is already configured with clean URLs plus cache & security headers. Every push auto-deploys.
 
-### Cloudflare Workers / Pages
-
-```bash
-npx --yes wrangler@latest deploy
-```
-
-`wrangler.jsonc` serves the `tooltopia/` directory as static assets.
+Production: https://tooltopia.vercel.app
 
 ## Project Structure
 
 ```
-├── tooltopia/
-│   ├── index.html          # Single page layout
-│   ├── style.css           # Design tokens, dark/light themes, components
-│   ├── script.js           # Data (TOOLS) + all UI logic
-│   ├── _headers            # Cloudflare headers config
-│   ├── sw.js               # Network-first service worker
-│   ├── manifest.webmanifest # PWA manifest
-│   ├── robots.txt
-│   ├── sitemap.xml
-│   └── assets/
+├── index.html              # Single page layout
+├── style.css               # Design tokens, dark/light themes, components
+├── script.js               # Data (TOOLS) + all UI logic
 ├── vercel.json             # Vercel headers / clean URLs
-├── wrangler.jsonc          # Cloudflare deploy config
+├── sw.js                   # Network-first service worker
+├── manifest.webmanifest    # PWA manifest
+├── robots.txt
+├── sitemap.xml
+└── assets/
+    ├── icons/
+    └── images/
 ```
 
 ## Adding a Tool
