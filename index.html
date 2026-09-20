@@ -46,6 +46,9 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3202800303748206" crossorigin="anonymous"></script>
 
+    <!-- Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -443,8 +446,11 @@
                 <h2>Stay Ahead of <span class="gradient-text">AI.</span></h2>
                 <p>Get new AI tools and useful discoveries delivered to your inbox.</p>
                 <form class="newsletter-form" id="newsletterForm" novalidate>
-                    <input type="email" id="newsletterEmail" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
-                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                    <div id="turnstile-widget" data-sitekey="0x4AAAAAAE94wF8JwLrQPN-3" data-theme="auto" data-action="newsletter"></div>
+                    <div class="newsletter-row">
+                        <input type="email" id="newsletterEmail" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </div>
                 </form>
                 <p class="newsletter-note">Free forever. No spam, unsubscribe anytime.</p>
             </div>

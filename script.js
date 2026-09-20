@@ -1946,7 +1946,12 @@
 
     newsletterForm.addEventListener('submit', function (e) {
         e.preventDefault();
+        var token = newsletterForm.querySelector('[name="cf-turnstile-response"]');
         var input = document.getElementById('newsletterEmail');
+        if (token && !token.value) {
+            showToast('Please complete the security check.', 'error');
+            return;
+        }
         if (!validateEmail(input)) {
             input.focus();
             newsletterForm.style.borderColor = 'var(--danger)';
