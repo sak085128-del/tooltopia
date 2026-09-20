@@ -5,6 +5,16 @@
 
     var FAV_KEY = 'tooltopia:favorites';
 
+    var ADSENSE_CLIENT = 'ca-pub-3202800303748206';
+
+    var ADSENSE_SLOTS = {
+        hero: null,
+        section: null,
+        new: null,
+        footer: null,
+        inline: null
+    };
+
     var TOOLS = [
 {
             id: 'chatgpt', name: 'ChatGPT', slug: 'chatgpt', icon: '💬', category: 'Writing',
@@ -1296,10 +1306,14 @@
     };
 
     var adCellTemplate = function () {
+        var slot = ADSENSE_SLOTS.inline;
+        var inner = slot
+            ? '<ins class="adsbygoogle" style="display:block" data-ad-client="' + ADSENSE_CLIENT + '" data-ad-slot="' + slot + '" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+            : '<div class="ad-placeholder">Advertisement Space</div>';
         return '<div class="ad-cell">' +
             '<div class="ad-container ad-inline" role="complementary" aria-label="Advertisement">' +
             '<span>ADVERTISEMENT</span>' +
-            '<div class="ad-placeholder">Advertisement Space</div>' +
+            inner +
             '</div>' +
             '</div>';
     };
@@ -1326,6 +1340,12 @@
         }
 
         directoryGrid.innerHTML = html;
+
+        if (ADSENSE_SLOTS.inline) {
+            directoryGrid.querySelectorAll('ins.adsbygoogle').forEach(function () {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            });
+        }
 
         var hasResults = all.length > 0;
         emptyState.hidden = hasResults;
@@ -1523,6 +1543,26 @@
         menuToggle.setAttribute('aria-expanded', 'false');
     };
 
+    function initAdSense() {
+        document.querySelectorAll('[data-ad-slot-key]').forEach(function (el) {
+            var key = el.getAttribute('data-ad-slot-key');
+            var slotId = ADSENSE_SLOTS[key];
+            if (!slotId) return;
+            el.querySelectorAll('ins.adsbygoogle').forEach(function (old) { old.remove(); });
+            var placeholder = el.querySelector('.ad-placeholder');
+            if (placeholder) placeholder.style.display = 'none';
+            var ins = document.createElement('ins');
+            ins.className = 'adsbygoogle';
+            ins.style.display = 'block';
+            ins.setAttribute('data-ad-client', ADSENSE_CLIENT);
+            ins.setAttribute('data-ad-slot', slotId);
+            ins.setAttribute('data-ad-format', 'auto');
+            ins.setAttribute('data-full-width-responsive', 'true');
+            el.appendChild(ins);
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        });
+    }
+
     function init() {
         statCount.textContent = String(TOOLS.length);
         renderStats();
@@ -1533,6 +1573,7 @@
         renderRecent();
         renderCompareTray();
         applyTheme(getTheme());
+        initAdSense();
 
         document.querySelectorAll('.category-count').forEach(function (el) {
             var cat = el.getAttribute('data-count');
