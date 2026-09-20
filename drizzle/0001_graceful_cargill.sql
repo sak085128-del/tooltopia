@@ -1,0 +1,1 @@
+ALTER TABLE "tool_submissions" ADD COLUMN "attachment_url" text;

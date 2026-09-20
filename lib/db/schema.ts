@@ -198,6 +198,7 @@ export const toolSubmissions = pgTable(
     name: text("name").notNull(),
     website_url: text("website_url").notNull(),
     description: text("description").notNull(),
+    attachment_url: text("attachment_url"),
     category_id: integer("category_id").references(() => categories.id),
     submitted_by: integer("submitted_by").references(() => users.id),
     status: submissionStatusEnum("status").default("pending").notNull(),

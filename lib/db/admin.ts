@@ -79,6 +79,7 @@ export async function getAdminSubmissions() {
       name: toolSubmissions.name,
       website_url: toolSubmissions.website_url,
       description: toolSubmissions.description,
+      attachment_url: toolSubmissions.attachment_url,
       category: categories.name,
       status: toolSubmissions.status,
       admin_notes: toolSubmissions.admin_notes,

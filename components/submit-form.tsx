@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 
 export function SubmitForm({
@@ -12,9 +12,12 @@ export function SubmitForm({
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +28,24 @@ export function SubmitForm({
     }
     setSubmitting(true);
     try {
+      let attachment_url: string | undefined;
+      if (file) {
+        setUploading(true);
+        const fd = new FormData();
+        fd.append("file", file);
+        const up = await fetch("/api/uploads", {
+          method: "POST",
+          body: fd,
+        });
+        const upData = await up.json().catch(() => ({}));
+        setUploading(false);
+        if (!up.ok || !upData?.url) {
+          setError(upData?.error ?? "Could not upload the image. Please try again.");
+          return;
+        }
+        attachment_url = upData.url as string;
+      }
+
       const res = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,6 +53,7 @@ export function SubmitForm({
           name: name.trim(),
           website_url: website.trim(),
           description: description.trim(),
+          attachment_url,
           category_id: categoryId ? Number(categoryId) : undefined,
         }),
       });
@@ -44,6 +66,7 @@ export function SubmitForm({
     } catch {
       setError("Something went wrong while submitting your tool. Please try again.");
     } finally {
+      setUploading(false);
       setSubmitting(false);
     }
   };
@@ -114,9 +137,28 @@ export function SubmitForm({
           ))}
         </select>
       </div>
+      <div className="form-field">
+        <label htmlFor="tool-file">Logo or screenshot (optional)</label>
+        <input
+          id="tool-file"
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+        <p className="hint">
+          {file
+            ? `${file.name} (${(file.size / 1024).toFixed(0)} KB) — uploaded after submit`
+            : "PNG, JPG, WebP, or GIF up to 2 MB."}
+        </p>
+      </div>
       {error && <div className="form-error">{error}</div>}
-      <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
-        {submitting ? "Submitting…" : "Submit Tool"}
+      <button
+        type="submit"
+        className="btn btn-primary btn-block"
+        disabled={submitting || uploading}
+      >
+        {uploading ? "Uploading image…" : submitting ? "Submitting…" : "Submit Tool"}
       </button>
     </form>
   );

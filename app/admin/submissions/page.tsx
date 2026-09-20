@@ -33,6 +33,7 @@ export default async function AdminSubmissionsPage() {
               <tr>
                 <th>Name</th>
                 <th>Website</th>
+                <th>Image</th>
                 <th>Category</th>
                 <th>Status</th>
                 <th>Submitted</th>
@@ -44,9 +45,27 @@ export default async function AdminSubmissionsPage() {
                 <tr key={s.id}>
                   <td style={{ fontWeight: 700 }}>{s.name}</td>
                   <td>
-                    <a href={s.website_url} target="_blank" rel="noopener noreferrer nofollow">
-                      {s.website_url.replace(/^https?:\/\//, "").slice(0, 40)}
-                    </a>
+                    {s.website_url ? (
+                      <a href={s.website_url} target="_blank" rel="noopener noreferrer nofollow">
+                        {s.website_url.replace(/^https?:\/\//, "").slice(0, 40)}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td>
+                    {s.attachment_url ? (
+                      <a href={s.attachment_url} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={s.attachment_url}
+                          alt={`${s.name} attachment`}
+                          style={{ height: 36, width: 36, objectFit: "cover", borderRadius: 8 }}
+                          loading="lazy"
+                        />
+                      </a>
+                    ) : (
+                      "—"
+                    )}
                   </td>
                   <td>{s.category ?? "—"}</td>
                   <td>

@@ -12,6 +12,7 @@ const submissionSchema = z.object({
   name: z.string().min(2).max(120),
   website_url: z.string().url().max(300),
   description: z.string().min(20).max(2000),
+  attachment_url: z.string().url().max(500).optional(),
   category_id: z.number().int().positive().optional(),
 });
 
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  const { name, website_url, description, category_id } = parsed.data;
+  const { name, website_url, description, attachment_url, category_id } = parsed.data;
 
   try {
     if (category_id) {
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
         name: sanitizeText(name, 120),
         website_url: sanitizeText(website_url, 300),
         description: sanitizeText(description, 2000),
+        attachment_url: attachment_url ? sanitizeText(attachment_url, 500) : null,
         category_id: category_id ?? null,
         submitted_by: submittedBy,
         status: "pending",
