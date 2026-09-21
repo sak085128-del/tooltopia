@@ -14,7 +14,9 @@ export const metadata: Metadata = {
 export default async function CategoriesPage() {
   let categories: Awaited<ReturnType<typeof getCategoriesWithCounts>> = [];
   try {
-    categories = await getCategoriesWithCounts();
+    categories = (await getCategoriesWithCounts()).filter(
+      (c) => (c.tool_count ?? 0) > 0,
+    );
   } catch (err) {
     console.error("Categories DB error:", err);
   }

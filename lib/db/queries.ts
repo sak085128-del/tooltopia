@@ -225,6 +225,8 @@ export async function getCategoriesWithCounts() {
 
 export async function getHomepageData() {
   const db = getDb();
+  const toolA = alias(tools, "toolA");
+  const toolB = alias(tools, "toolB");
   const [stats, categoriesList, featured, popular, newest, free, comparisonRows] =
     await Promise.all([
       db
@@ -235,7 +237,9 @@ export async function getHomepageData() {
         })
         .from(tools)
         .where(eq(tools.status, APPROVED)),
-      getCategoriesWithCounts(),
+      getCategoriesWithCounts().then((list) =>
+        list.filter((c) => (c.tool_count ?? 0) > 0),
+      ),
       queryTools({ featuredOnly: true, pageSize: 8, sort: "rating" }),
       queryTools({ popularOnly: true, pageSize: 8, sort: "popular" }),
       queryTools({ newOnly: true, pageSize: 8, sort: "newest" }),
@@ -243,12 +247,12 @@ export async function getHomepageData() {
       db
         .select({
           comparison: comparisons,
-          toolA: tools,
-          toolB: tools,
+          toolA,
+          toolB,
         })
         .from(comparisons)
-        .innerJoin(tools, eq(comparisons.tool_a_id, tools.id))
-        .innerJoin(tools, eq(comparisons.tool_b_id, tools.id))
+        .innerJoin(toolA, eq(comparisons.tool_a_id, toolA.id))
+        .innerJoin(toolB, eq(comparisons.tool_b_id, toolB.id))
         .limit(4),
     ]);
 

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getDb } from "@/lib/db/client";
-import { tools, categories, comparisons, toolSubmissions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { tools, categories, comparisons } from "@/lib/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { getBaseUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +28,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .where(eq(tools.status, "approved")),
       db
         .select({ slug: categories.slug, updatedAt: categories.updatedAt })
-        .from(categories),
+        .from(categories)
+        .where(
+          sql`exists (select 1 from ${tools} t where t.category_id = ${categories.id} and t.status = 'approved')`,
+        ),
       db.select({ slug: comparisons.slug, updatedAt: comparisons.updatedAt }).from(comparisons),
     ]);
 
